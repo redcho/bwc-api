@@ -6,5 +6,9 @@ public class AppConfig {
     public static final String BASE_URL = "https://eu.api.blizzard.com/";
     public static final String LOCALE = "en_GB";
 
+    public static final String NS_STATIC = "static-eu";
+    public static final String NS_DYNAMIC = "dynamic-eu";
+    public static final String NS_PROFILE = "profile-eu";
+
     static { }
 }

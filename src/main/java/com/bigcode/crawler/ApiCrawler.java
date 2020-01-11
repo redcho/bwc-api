@@ -2,7 +2,6 @@ package com.bigcode.crawler;
 
 import com.bigcode.auth.OAuth2FlowHandler;
 import com.bigcode.auth.OAuth2FlowHandlerImpl;
-import com.bigcode.config.AppConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,6 +12,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Map;
+
+import static com.bigcode.config.AppConfig.*;
 
 /**
  * Used to retrieve arbitrary data from the Blizzard Battle.net APIs, transform the result, and return the result.
@@ -39,7 +40,7 @@ public class ApiCrawler {
         HttpRequest request = HttpRequest.newBuilder()
                 .GET()
 //                .uri(URI.create(AppConfig.BASE_URL + relativePath))
-                .uri(URI.create("https://eu.api.blizzard.com/data/wow/realm/index?namespace=dynamic-eu&locale=en_GB"))
+                .uri(URI.create( BASE_URL + relativePath + "?namespace=" + NS_DYNAMIC + "&locale=" + LOCALE ))
                 .setHeader("Authorization", "Bearer " + token)
 //                .setHeader("region", "eu")
 //                .setHeader("namespace", "dynamic-eu")
@@ -49,10 +50,10 @@ public class ApiCrawler {
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         // print status code
-        System.out.println(response.statusCode());
+//        System.out.println(response.statusCode());
 
         // print response body
-        System.out.println(response.body());
+        System.out.println("RESPONSE = " + response.body());
 
         return response.body();
     }
