@@ -40,21 +40,17 @@ public final class GCSHandler {
 
             WritableByteChannel channelToOutputStream = Channels.newChannel(baos);
             ByteBuffer bytes = ByteBuffer.allocate(DEFAULT_CHUNK_SIZE);
+            StringBuilder sb = new StringBuilder();
             while(reader.read(bytes) > 0){
                 bytes.flip();
-
-                String s = new String(bytes.array(), UTF_8); // WORKS, INSTEAD USE STRING BUILDER TO APPEND BYTES ?
-
-                channelToOutputStream.write(bytes); // TODO doesn't work
+                channelToOutputStream.write(bytes);
                 bytes.clear();
             }
 
-            String data = new String(baos.toByteArray(), UTF_8);
-            System.out.println(data);
+            return new String(baos.toByteArray(), UTF_8);
         }catch(IOException ex){
             ex.printStackTrace();
+            return null;
         }
-
-        return "";
     }
 }

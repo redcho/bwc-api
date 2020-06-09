@@ -3,6 +3,7 @@ package com.bigcode.crawler;
 import com.bigcode.handler.GCSHandler;
 import com.bigcode.model.Realm;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.cloud.storage.*;
@@ -19,31 +20,45 @@ import static com.google.api.client.util.Charsets.UTF_8;
 
 public class Crawler {
 
-    Logger log = LogManager.getLogger(Crawler.class);
+    private static Logger log = LogManager.getLogger(Crawler.class);
     private static ObjectMapper mapper = new ObjectMapper();
 
     public static void main(String[] args) throws IOException {
-        ApiCrawler crawler = new ApiCrawler();
+        List<Realm> realms = getRealms(downloadRealmListFromGCS());
+    }
 
-        String relativePath = "/data/wow/realm/index";
+    public static String downloadRealmListFromAPI(){
+        WowCrawler wowCrawler = new WowCrawler();
+        return wowCrawler.downloadRealms();
+    }
+
+    public static String downloadRealmListFromGCS(){
+        return GCSHandler.downloadString("wow-static", "realms.json");
+    }
+
+    public static List<Realm> getRealms(String realmListStr){
+        Realm[] list = new Realm[0];
         try {
-//            String response = crawler.getDataFromRelativePath(relativePath, null);
-//
-//            JsonNode rootNode = mapper.readTree(response);
-//            String realmsArrStr = rootNode.path("realms").toString();
-//            Realm[] list = mapper.readValue(realmsArrStr, Realm[].class);
-
-//            ArrayList<Realm> realmList = new ArrayList();
-//            realmList.addAll(Arrays.asList(list));
-//            realmList.forEach(System.out::println);
-
-//            GCSHandler.uploadString("wow-static", "realms.json", realmsArrStr);
-            GCSHandler.downloadString("wow-static", "realms.json");
-
-        }catch(Exception ex){
-            ex.printStackTrace();
+            list = mapper.readValue(realmListStr, Realm[].class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
         }
+        List<Realm> realmList = Arrays.asList(list);
+//        realmList.forEach(System.out::println);
+        return realmList;
+    }
 
+    public static void uploadRealmListToGCS() {
+        try {
+            String response = downloadRealmListFromAPI();
+
+            JsonNode rootNode = mapper.readTree(response);
+            String realmsArrStr = rootNode.path("realms").toString();
+
+            GCSHandler.uploadString("wow-static", "realms.json", realmsArrStr);
+        } catch (Exception ex) {
+            log.error(ex);
+        }
     }
 
 }
