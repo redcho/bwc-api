@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+import "Payload.proto";
+
+option java_package = "com.bigcode.proto";
+option java_outer_classname = "LeaderboardProtos";
+
+message Leaderboard {
+    int32 id = 1;
+    string name = 2;
+    Payload key = 3;
+}
+
+message LeaderboardArr {
+    repeated Leaderboard leaderboards = 1;
+}

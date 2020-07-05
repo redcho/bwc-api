@@ -20,7 +20,7 @@ import static com.bigcode.config.AppConfig.*;
  */
 public class ApiCrawler {
     private OAuth2FlowHandler tokenManager = new OAuth2FlowHandlerImpl();
-    private Logger log = LogManager.getLogger(ApiCrawler.class);
+    private static Logger log = LogManager.getLogger(ApiCrawler.class);
 
     private final HttpClient httpClient = HttpClient.newBuilder()
             .version(HttpClient.Version.HTTP_2)
@@ -35,27 +35,24 @@ public class ApiCrawler {
      * @throws IOException
      * @throws URISyntaxException
      */
-    public String getDataFromRelativePath(final String relativePath, final Map<String, String> params) throws IOException, URISyntaxException, InterruptedException {
-        String token = tokenManager.getToken();
-        HttpRequest request = HttpRequest.newBuilder()
-                .GET()
-//                .uri(URI.create(AppConfig.BASE_URL + relativePath))
-                .uri(URI.create( BASE_URL + relativePath + "?namespace=" + NS_DYNAMIC + "&locale=" + LOCALE ))
-                .setHeader("Authorization", "Bearer " + token)
-//                .setHeader("region", "eu")
-//                .setHeader("namespace", "dynamic-eu")
-//                .setHeader("locale", "en_GB")
-                .build();
+    public String getDataFromRelativePath(final String relativePath, final Map<String, String> params){
+        try {
+            String token = tokenManager.getToken();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .GET()
+                    .uri(URI.create(BASE_URL + relativePath + "?namespace=" + NS_DYNAMIC + "&locale=" + LOCALE))
+                    .setHeader("Authorization", "Bearer " + token)
+                    .build();
 
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-        // print status code
-//        System.out.println(response.statusCode());
+            log.info("RESPONSE (" + response.statusCode() +") = " + response.body());
 
-        // print response body
-        System.out.println("RESPONSE = " + response.body());
-
-        return response.body();
+            return response.body();
+        }catch (Exception ex){
+            log.error(ex);
+            return null;
+        }
     }
 
 }

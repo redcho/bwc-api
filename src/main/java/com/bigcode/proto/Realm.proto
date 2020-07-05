@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+import "Payload.proto";
+
+option java_package = "com.bigcode.proto";
+option java_outer_classname = "RealmProtos";
+
+message Realm {
+    int32 id = 1;
+    string name = 2;
+    string slug = 3;
+    Payload key = 4;
+}
+
+message RealmArr {
+    repeated Realm realms = 1;
+}
